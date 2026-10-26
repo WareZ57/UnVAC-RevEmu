@@ -1,0 +1,4 @@
+*.smx binary
+*.sp text eol=lf
+*.txt text eol=lf
+*.cfg text eol=lf

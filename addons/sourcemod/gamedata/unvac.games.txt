@@ -1,0 +1,63 @@
+// UnVAC (plugins/unvac.sp): engine function found by its Linux symbol name, hooked with a DHooks detour
+"Games"
+{
+	"cstrike"
+	{
+		"Signatures"
+		{
+			// bool CSteam3Server::NotifyClientConnect(CBaseClient *client, uint userID, netadr_t &adr,
+			// const void *cookie, uint cookieLength): checks the Steam ticket of a connecting client
+			// (ISteamGameServer::BeginAuthSession) and refuses it when the result is not OK.
+			// this + 4 is the ISteamGameServer pointer (checked 2026-10-26 in cstrike/bin/engine_srv.so)
+			"CSteam3Server::NotifyClientConnect"
+			{
+				"library"	"engine"
+				"linux"		"@_ZN13CSteam3Server19NotifyClientConnectEP11CBaseClientjR8netadr_sPKvj"
+			}
+		}
+
+		"Functions"
+		{
+			"CSteam3Server::NotifyClientConnect"
+			{
+				"signature"	"CSteam3Server::NotifyClientConnect"
+				"callconv"	"thiscall"
+				"return"	"bool"
+				"this"		"address"
+				"arguments"
+				{
+					"client"
+					{
+						"type"	"int"
+					}
+					"userid"
+					{
+						"type"	"int"
+					}
+					"adr"
+					{
+						"type"	"int"
+					}
+					"cookie"
+					{
+						"type"	"int"
+					}
+					"cookielen"
+					{
+						"type"	"int"
+					}
+				}
+			}
+		}
+
+		"Offsets"
+		{
+			// ISteamGameServer::BeginAuthSession(const void *ticket, int ticketLength, CSteamID id):
+			// vtable index called by CSteam3Server::NotifyClientConnect ([vtable + 0x68] / 4)
+			"BeginAuthSession"
+			{
+				"linux"		"26"
+			}
+		}
+	}
+}

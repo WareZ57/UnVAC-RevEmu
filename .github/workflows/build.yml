@@ -1,0 +1,32 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      SM_BUILD: 1.12.0-git7259
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SourceMod 1.12
+        run: |
+          curl -fsSL "https://sm.alliedmods.net/smdrop/1.12/sourcemod-${SM_BUILD}-linux.tar.gz" | tar xz -C "$RUNNER_TEMP"
+
+      - name: Compile
+        working-directory: addons/sourcemod/scripting
+        run: |
+          mkdir -p "$RUNNER_TEMP/plugins"
+          for sp in *.sp; do
+            "$RUNNER_TEMP/addons/sourcemod/scripting/spcomp64" "$sp" \
+              -i"$RUNNER_TEMP/addons/sourcemod/scripting/include" -E -o"$RUNNER_TEMP/plugins/${sp%.sp}.smx"
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plugins
+          path: ${{ runner.temp }}/plugins
